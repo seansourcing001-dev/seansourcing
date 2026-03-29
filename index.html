@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sean Sourcing Trading Firm</title>
+    <!-- 引入 Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- 全局样式设置 --- */
+        :root {
+            --primary-color: #0d2c54; /* 深蓝主色调 */
+            --accent-color: #c5a059; /* 金色点缀 */
+            --text-color: #333;
+            --light-bg: #f9f9f9;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: var(--text-color); line-height: 1.6; background-color: var(--light-bg); }
+        a { text-decoration: none; color: inherit; cursor: pointer; }
+        ul { list-style: none; }
+
+        /* --- 导航栏 --- */
+        header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 1rem 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        nav { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: bold; letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links li a { cursor: pointer; transition: color 0.3s; font-weight: 500; }
+        .nav-links li a:hover, .nav-links li a.active { color: var(--accent-color); }
+
+        /* --- 页面切换逻辑 --- */
+        .page-section { display: none; padding-top: 60px; min-height: 100vh; animation: fadeIn 0.5s; }
+        .page-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- 第一页：Home --- */
+        .hero {
+            background: linear-gradient(rgba(13, 44, 84, 0.7), rgba(13, 44, 84, 0.7)), url('https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: var(--white);
+            padding: 0 20px;
+        }
+        .hero h1 { font-size: 3rem; margin-bottom: 10px; text-transform: uppercase; }
+        .hero p { font-size: 1.2rem; font-weight: 300; max-width: 700px; }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        .section-title { text-align: center; margin-bottom: 30px; color: var(--primary-color); font-size: 2rem; text-transform: uppercase; position: relative; }
+        .section-title::after { content: ''; display: block; width: 50px; height: 3px; background: var(--accent-color); margin: 10px auto 0; }
+
+        .about-text { text-align: center; max-width: 800px; margin: 0 auto 40px; font-size: 1.1rem; }
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .service-card { background: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 4px solid var(--accent-color); }
+        .service-card h3 { margin-bottom: 10px; color: var(--primary-color); }
+
+        .advantages-section { background-color: var(--primary-color); color: var(--white); }
+        .advantages-section .section-title { color: var(--white); }
+        .adv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; text-align: center; }
+        .adv-item i { font-size: 2.5rem; color: var(--accent-color); margin-bottom: 15px; }
+        .adv-item h4 { font-size: 1.2rem; margin-bottom: 10px; }
+
+        .home-contact { text-align: center; background: #fff; padding: 40px 20px; }
+        .contact-info-large { font-size: 1.2rem; margin: 20px 0; }
+        .btn { display: inline-block; background: var(--accent-color); color: var(--white); padding: 12px 30px; border-radius: 5px; font-weight: bold; transition: background 0.3s; cursor: pointer; }
+        .btn:hover { background: #b08d4b; }
+
+        /* --- 第二页：Products --- */
+        .product-category { border-bottom: 1px solid #ddd; margin-bottom: 10px; }
+        .category-header {
+            background: var(--white);
+            padding: 15px 20px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .category-header:hover { background: #f0f0f0; }
+        .category-header i { transition: transform 0.3s; }
+        .category-header.open i { transform: rotate(180deg); }
+        
+        .subcategories { display: none; padding: 20px; background: #f4f4f4; }
+        .subcategories.show { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
+        
+        .sub-item { text-align: center; transition: transform 0.2s; }
+        .sub-item:hover { transform: scale(1.05); }
+        
+        /* 产品占位图样式 (渐变色+图标) */
+        .product-placeholder {
+            width: 100%;
+            height: 120px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .sub-item p { margin-top: 8px; font-size: 0.9rem; font-weight: 600; color: #555; }
+
+        .no-products { text-align: center; padding: 40px; background: #fff; margin-top: 20px; border-radius: 8px; border: 1px solid #ddd; }
+        .no-products i { color: #d9534f; font-size: 2rem; margin-bottom: 10px; }
+
+        /* --- 第三页：Contact Us --- */
+        .contact-page-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; padding: 60px 20px; }
+        .contact-card { background: var(--white); padding: 40px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; min-width: 300px; }
+        .contact-card h2 { color: var(--primary-color); margin-bottom: 20px; }
+        .contact-method { margin: 20px 0; font-size: 1.2rem; }
+        .contact-method i { color: var(--accent-color); margin-right: 10px; font-size: 1.5rem; }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .nav-links { gap: 10px; font-size: 0.9rem; }
+            .contact-page-container { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 导航栏 -->
+    <header>
+        <nav>
+            <div class="logo">SEAN SOURCING</div>
+            <ul class="nav-links">
+                <li><a onclick="switchPage('home')" id="nav-home" class="active">Home Page</a></li>
+                <li><a onclick="switchPage('products')" id="nav-products">The Products</a></li>
+                <li><a onclick="switchPage('contact')" id="nav-contact">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- 第一页：Home Page -->
+    <section id="home" class="page-section active">
+        <div class="hero">
+            <h1>Sean Sourcing Trading Firm</h1>
+            <p>Your trusted partner for global sourcing and trading solutions</p>
+        </div>
+
+        <div class="container">
+            <h2 class="section-title">About Us</h2>
+            <div class="about-text">
+                <p>Sean Sourcing Trading Firm is a specialized sourcing and trading company, dedicated to streamlining international trade with reliability.</p>
+                <br>
+                <p>We operate with sincerity and integrity, serving each client with unwavering dedication and commitment.</p>
+                <br>
+                <p>We believe that good products can improve our lives and make the world a better place.</p>
+            </div>
+        </div>
+
+        <div class="container" style="background-color: #fff;">
+            <h2 class="section-title">Our Services</h2>
+            <div class="services-grid">
+                <div class="service-card"><h3><i class="fas fa-search"></i> Product Sourcing & Verification</h3></div>
+                <div class="service-card"><h3><i class="fas fa-check-circle"></i> Quality Control & Inspection</h3></div>
+                <div class="service-card"><h3><i class="fas fa-shipping-fast"></i> Logistics & Shipping Management</h3></div>
+                <div class="service-card"><h3><i class="fas fa-handshake"></i> Negotiation & Price Optimization</h3></div>
+                <div class="service-card"><h3><i class="fas fa-drafting-compass"></i> Custom Product Development</h3></div>
+                <div class="service-card"><h3><i class="fas fa-chart-line"></i> Market Research & Analysis</h3></div>
+            </div>
+        </div>
+
+        <div class="container advantages-section">
+            <h2 class="section-title">Why Choose Us</h2>
+            <div class="adv-grid">
+                <div class="adv-item"><i class="fas fa-users"></i><h4>Honest and responsible cooperation methods</h4></div>
+                <div class="adv-item"><i class="fas fa-brain"></i><h4>Good understanding of your intentions</h4></div>
+                <div class="adv-item"><i class="fas fa-tags"></i><h4>Reasonable and transparent pricing</h4></div>
+                <div class="adv-item"><i class="fas fa-box-open"></i><h4>Small orders are warmly welcomed</h4></div>
+                <div class="adv-item"><i class="fas fa-shield-alt"></i><h4>Compensation for mistakes</h4></div>
+            </div>
+        </div>
+
+        <div class="container home-contact">
+            <h2 class="section-title">Contact Us</h2>
+            <div class="contact-info-large">
+                <p><i class="fab fa-whatsapp"></i> +86 18856851677</p>
+                <p><i class="fab fa-weixin"></i> 17556804707</p>
+                <p><i class="fas fa-envelope"></i> seansourcing001@gmail.com</p>
+            </div>
+            <a onclick="switchPage('products')" class="btn">The Products You May Interest <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </section>
+
+    <!-- 第二页：The Products -->
+    <section id="products" class="page-section">
+        <div class="container">
+            <h2 class="section-title">Our Product Categories</h2>
+            <p style="text-align: center; margin-bottom: 30px;">Click a category to view subcategories. Click an image to contact us.</p>
+            
+            <div id="product-list">
+                <!-- 产品列表将通过 JavaScript 动态生成 -->
+            </div>
+
+            <div class="no-products">
+                <i class="fas fa-ban"></i>
+                <h3>The Products We Don’t Do</h3>
+                <p>Due to my personal beliefs and legal regulations, we do not deal in products or services involving pornography or violence.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 第三页：Contact Us -->
+    <section id="contact" class="page-section">
+        <div class="container">
+            <h2 class="section-title">Get In Touch</h2>
+            <div class="contact-page-container">
+                <div class="contact-card">
+                    <h2>Contact Information</h2>
+                    <p>We are ready to help you source the best products.</p>
+                    
+                    <div class="contact-method">
+                        <a href="https://wa.me/8618856851677" target="_blank">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </a>
+                        <p>+86 188 5685 1677</p>
+                    </div>
+
+                    <div class="contact-method">
+                        <i class="fab fa-weixin"></i> WeChat
+                        <p>17556804707</p>
+                    </div>
+
+                    <div class="contact-method">
+                        <a href="mailto:seansourcing001@gmail.com">
+                            <i class="fas fa-envelope"></i> Email
+                        </a>
+                        <p>seansourcing001@gmail.com</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript 逻辑 -->
+    <script>
+        // 1. 页面切换功能
+        function switchPage(pageId) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page-section').forEach(page => {
+                page.classList.remove('active');
+            });
+            // 移除导航激活状态
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // 显示目标页面
+            document.getElementById(pageId).classList.add('active');
+            // 激活对应导航
+            document.getElementById('nav-' + pageId).classList.add('active');
+            
+            // 滚动到顶部
+            window.scrollTo(0, 0);
+        }
+
+        // 2. 产品数据配置
+        const productsData = [
+            { name: "Apparel and Accessories", icon: "fa-tshirt", items: ["T-Shirts", "Dresses", "Shoes", "Bags", "Jewelry", "Hats"] },
+            { name: "Home Appliances", icon: "fa-blender", items: ["Blender", "Vacuum", "Air Fryer", "Coffee Maker", "Iron", "Humidifier"] },
+            { name: "Electronics", icon: "fa-headphones", items: ["Headphones", "Smart Watch", "Phone Case", "Power Bank", "Cables", "Speakers"] },
+            { name: "Toys", icon: "fa-puzzle-piece", items: ["Action Figures", "Dolls", "Building Blocks", "RC Cars", "Educational Toys", "Plushies"] },
+            { name: "Car Accessories", icon: "fa-car", items: ["Dash Cam", "Seat Covers", "Phone Holder", "Car Charger", "Cleaning Kit", "LED Lights"] },
+            { name: "Sports & Outdoors", icon: "fa-basketball-ball", items: ["Yoga Mat", "Dumbbells", "Camping Tent", "Bicycle", "Fishing Gear", "Running Shoes"] },
+            { name: "Industrial Products", icon: "fa-cogs", items: ["Drill Bits", "Safety Helmets", "Work Gloves", "LED Panels", "Pumps", "Valves"] },
+            { name: "Green Products", icon: "fa-leaf", items: ["Solar Lights", "Bamboo Toothbrush", "Recycled Bags", "Eco Cups", "Biodegradable Straws", "Compost Bin"] },
+            { name: "Pet Products", icon: "fa-dog", items: ["Dog Collar", "Cat Tree", "Pet Bed", "Feeder", "Toys", "Grooming Tools"] }
+        ];
+
+        // 3. 动态生成产品HTML
+        const productContainer = document.getElementById('product-list');
+
+        productsData.forEach((category, index) => {
+            // 创建大类容器
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'product-category';
+
+            // 创建头部（点击展开）
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'category-header';
+            headerDiv.innerHTML = `${category.name} <i class="fas fa-chevron-down"></i>`;
+            
+            // 创建子类目容器
+            const subDiv = document.createElement('div');
+            subDiv.className = 'subcategories';
+
+            // 生成子类目内容
+            category.items.forEach(item => {
+                const subItemDiv = document.createElement('div');
+                subItemDiv.className = 'sub-item';
+                
+                // 定义渐变色背景
+                const colors = [
+                    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)',
+                    'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
+                    'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+                    'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)'
+                ];
+                const randomColor = colors[index % colors.length];
+
+                // 这里的 onclick 确保跳转到第三页
+                subItemDiv.innerHTML = `
+                    <a onclick="switchPage('contact')">
+                        <div class="product-placeholder" style="background: ${randomColor}">
+                            <i class="fas ${category.icon}"></i>
+                        </div>
+                        <p>${item}</p>
+                    </a>
+                `;
+                subDiv.appendChild(subItemDiv);
+            });
+
+            // 绑定点击展开事件
+            headerDiv.addEventListener('click', () => {
+                const isOpen = subDiv.classList.contains('show');
+                if (!isOpen) {
+                    subDiv.classList.add('show');
+                    headerDiv.classList.add('open');
+                } else {
+                    subDiv.classList.remove('show');
+                    headerDiv.classList.remove('open');
+                }
+            });
+
+            categoryDiv.appendChild(headerDiv);
+            categoryDiv.appendChild(subDiv);
+            productContainer.appendChild(categoryDiv);
+        });
+    </script>
+</body>
+</html>
